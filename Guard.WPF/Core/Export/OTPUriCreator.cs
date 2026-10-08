@@ -1,4 +1,5 @@
-﻿using Guard.Core.Models;
+﻿using Guard.Core;
+using Guard.Core.Models;
 
 namespace Guard.WPF.Core.Export
 {
@@ -6,6 +7,11 @@ namespace Guard.WPF.Core.Export
     {
         internal static string GetUri(TOTPTokenHelper token)
         {
+            if (RegistrySettings.PreventUnencryptedExports())
+            {
+                throw new InvalidOperationException(I18n.GetString("i.export.failed.unencrypted"));
+            }
+
             DBTOTPToken dBToken = token.dBToken;
             string uri = $"otpauth://totp/{Uri.EscapeDataString(dBToken.Issuer)}";
 
