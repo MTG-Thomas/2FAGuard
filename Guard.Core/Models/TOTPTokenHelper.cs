@@ -17,11 +17,8 @@ namespace Guard.Core.Models
         {
             this.dBToken = dBToken;
             EncryptionHelper encryption = Auth.GetMainEncryptionHelper();
-            DecryptedSecret = encryption.DecryptBytesToString(dBToken.EncryptedSecret);
-            if (dBToken.EncryptedUsername != null)
-            {
-                Username = encryption.DecryptBytesToString(dBToken.EncryptedUsername);
-            }
+            DecryptedSecret = dBToken.DecryptSecret(encryption);
+            Username = dBToken.DecryptUsername(encryption);
             secret = Base32Encoding.ToBytes(DecryptedSecret);
 
             OtpHashMode hashMode = OtpHashMode.Sha1;

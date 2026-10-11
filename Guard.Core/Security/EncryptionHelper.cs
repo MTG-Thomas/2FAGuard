@@ -24,15 +24,32 @@ namespace Guard.Core.Security
             return Convert.ToBase64String(EncryptBytes(Encoding.UTF8.GetBytes(plainText)));
         }
 
+        public string EncryptString(string plainText, byte[] associatedData)
+        {
+            return Convert.ToBase64String(
+                EncryptBytes(Encoding.UTF8.GetBytes(plainText), associatedData)
+            );
+        }
+
         public byte[] EncryptStringToBytes(string plainText)
         {
             return EncryptBytes(Encoding.UTF8.GetBytes(plainText));
         }
 
+        public byte[] EncryptStringToBytes(string plainText, byte[] associatedData)
+        {
+            return EncryptBytes(Encoding.UTF8.GetBytes(plainText), associatedData);
+        }
+
         public byte[] EncryptBytes(byte[] bytes)
         {
+            return EncryptBytes(bytes, null);
+        }
+
+        public byte[] EncryptBytes(byte[] bytes, byte[]? associatedData)
+        {
             byte[] nonce = GenerateNonce();
-            byte[] encrypted = aegis.Encrypt(key, nonce, null, bytes);
+            byte[] encrypted = aegis.Encrypt(key, nonce, associatedData, bytes);
 
             byte[] result = new byte[NonceSize + encrypted.Length];
             Buffer.BlockCopy(nonce, 0, result, 0, NonceSize);
@@ -51,9 +68,21 @@ namespace Guard.Core.Security
             return Encoding.UTF8.GetString(DecryptBytes(Convert.FromBase64String(encryptedText)));
         }
 
+        public string DecryptString(string encryptedText, byte[]? associatedData)
+        {
+            return Encoding.UTF8.GetString(
+                DecryptBytes(Convert.FromBase64String(encryptedText), associatedData)
+            );
+        }
+
         public string DecryptBytesToString(byte[] allBytes)
         {
             return Encoding.UTF8.GetString(DecryptBytes(allBytes));
+        }
+
+        public string DecryptBytesToString(byte[] allBytes, byte[]? associatedData)
+        {
+            return Encoding.UTF8.GetString(DecryptBytes(allBytes, associatedData));
         }
 
         public byte[] DecryptStringToBytes(string encryptedText)
@@ -63,13 +92,23 @@ namespace Guard.Core.Security
 
         public byte[] DecryptBytes(byte[] allBytes)
         {
+            return DecryptBytes(allBytes, null);
+        }
+
+        public byte[] DecryptBytes(byte[] allBytes, byte[]? associatedData)
+        {
+            if (allBytes.Length < NonceSize)
+            {
+                throw new CryptographicException("Encrypted value is too short");
+            }
+
             byte[] nonce = new byte[NonceSize];
             Buffer.BlockCopy(allBytes, 0, nonce, 0, NonceSize);
 
             byte[] encrypted = new byte[allBytes.Length - NonceSize];
             Buffer.BlockCopy(allBytes, NonceSize, encrypted, 0, encrypted.Length);
 
-            return aegis.Decrypt(key, nonce, null, encrypted)
+            return aegis.Decrypt(key, nonce, associatedData, encrypted)
                 ?? throw new CryptographicException("Decryption failed (null)");
         }
 

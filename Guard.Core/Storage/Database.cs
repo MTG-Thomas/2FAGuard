@@ -61,6 +61,18 @@ namespace Guard.Core.Storage
             tokens.Insert(token);
         }
 
+        public static void UpdateToken(DBTOTPToken token)
+        {
+            if (tokens == null)
+            {
+                throw new Exception("Database not initialized");
+            }
+            if (!tokens.Update(token))
+            {
+                throw new Exception($"Token {token.Id} no longer exists");
+            }
+        }
+
         public static void DeleteTokenById(int id)
         {
             if (tokens == null)
