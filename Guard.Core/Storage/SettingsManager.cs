@@ -10,10 +10,17 @@ namespace Guard.Core.Storage
             "settings"
         );
 
-        public static AppSettings Settings = new();
+        private static AppSettings? settings;
+
+        public static AppSettings Settings =>
+            settings
+            ?? throw new InvalidOperationException(
+                "SettingsManager.Init must be called before accessing settings"
+            );
 
         public static void Init()
         {
+            AppSettings loadedSettings = new();
             if (File.Exists(settingsFilePath))
             {
                 byte[] fileData = File.ReadAllBytes(settingsFilePath);
@@ -21,9 +28,10 @@ namespace Guard.Core.Storage
                 AppSettings? appSettings = JsonSerializer.Deserialize<AppSettings>(fileContent);
                 if (appSettings != null)
                 {
-                    Settings = appSettings;
+                    loadedSettings = appSettings;
                 }
             }
+            settings = loadedSettings;
         }
 
         public static async Task Save()
