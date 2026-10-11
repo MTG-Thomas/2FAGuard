@@ -64,6 +64,8 @@ Create a subkey named `Setup` in the path specified above. The following values 
 
 If two of the above keys are set to `1`, the welcome screen will not be displayed and the only remaining option will be selected automatically. If all three keys are set to `1`, all options will be shown like default.
 
+The insecure skip option always requires the user to confirm its plaintext key-storage warning, including when `HideWinHello` and `HidePassword` leave skip as the only visible option. These per-user registry values cannot silently approve insecure storage.
+
 ### Modify settings
 
 Create a subkey named `Settings` in the path specified above. These keys can be helpful if these features are not available in a server environment. The following values can be set:
