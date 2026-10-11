@@ -64,7 +64,7 @@ namespace Guard.WPF.Views.Pages.Start
             }
             if (hideWinHello && hidePassword)
             {
-                SetupInsecure(false);
+                SetupInsecure();
             }
         }
 
@@ -121,24 +121,21 @@ namespace Guard.WPF.Views.Pages.Start
             SetupInsecure();
         }
 
-        private async void SetupInsecure(bool showWarning = true)
+        private async void SetupInsecure()
         {
-            if (showWarning)
-            {
-                Wpf.Ui.Controls.MessageBoxResult sucessDialogResult =
-                    await new Wpf.Ui.Controls.MessageBox
-                    {
-                        Title = I18n.GetString("welcome.insecure.dialog.title"),
-                        Content = I18n.GetString("welcome.insecure.dialog.content"),
-                        CloseButtonText = I18n.GetString("dialog.close"),
-                        PrimaryButtonText = I18n.GetString("welcome.insecure.dialog.continue"),
-                        MaxWidth = 500,
-                    }.ShowDialogAsync();
-
-                if (sucessDialogResult != Wpf.Ui.Controls.MessageBoxResult.Primary)
+            Wpf.Ui.Controls.MessageBoxResult sucessDialogResult =
+                await new Wpf.Ui.Controls.MessageBox
                 {
-                    return;
-                }
+                    Title = I18n.GetString("welcome.insecure.dialog.title"),
+                    Content = I18n.GetString("welcome.insecure.dialog.content"),
+                    CloseButtonText = I18n.GetString("dialog.close"),
+                    PrimaryButtonText = I18n.GetString("welcome.insecure.dialog.continue"),
+                    MaxWidth = 500,
+                }.ShowDialogAsync();
+
+            if (sucessDialogResult != Wpf.Ui.Controls.MessageBoxResult.Primary)
+            {
+                return;
             }
 
             try
