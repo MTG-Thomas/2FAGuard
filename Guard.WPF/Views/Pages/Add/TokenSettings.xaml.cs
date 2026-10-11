@@ -102,15 +102,9 @@ namespace Guard.WPF.Views.Pages.Add
                 {
                     try
                     {
-                        MemoryStream notesStream = new(
+                        Notes.Document = NotesDocumentCodec.Load(
                             encryptionHelper.DecryptBytes(existingToken.dBToken.EncryptedNotes)
                         );
-                        TextRange notesRange = new(
-                            Notes.Document.ContentStart,
-                            Notes.Document.ContentEnd
-                        );
-                        notesRange.Load(notesStream, DataFormats.Xaml);
-                        notesStream.Close();
                     }
                     catch (Exception ex)
                     {

@@ -445,11 +445,7 @@ namespace Guard.WPF.Views.UIComponents
             {
                 var notesBytes = Auth.GetMainEncryptionHelper()
                     .DecryptBytes(token.dBToken.EncryptedNotes);
-                using var notesStream = new MemoryStream(notesBytes);
-
-                var doc = new FlowDocument();
-                var notesRange = new TextRange(doc.ContentStart, doc.ContentEnd);
-                notesRange.Load(notesStream, DataFormats.Xaml);
+                FlowDocument doc = NotesDocumentCodec.Load(notesBytes);
 
                 var viewer = new FlowDocumentScrollViewer { Document = doc };
 
