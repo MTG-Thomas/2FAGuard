@@ -86,9 +86,15 @@ namespace Guard.WPF.Core.Security
             var plii = new LASTINPUTINFO();
             plii.cbSize = (uint)Marshal.SizeOf(plii);
             if (GetLastInputInfo(ref plii))
-                return TimeSpan.FromMilliseconds(Environment.TickCount - plii.dwTime);
+                return GetElapsedInputTime(unchecked((uint)Environment.TickCount), plii.dwTime);
             else
                 throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        internal static TimeSpan GetElapsedInputTime(uint currentTick, uint lastInputTick)
+        {
+            uint elapsedMilliseconds = unchecked(currentTick - lastInputTick);
+            return TimeSpan.FromMilliseconds(elapsedMilliseconds);
         }
 
         [DllImport("user32.dll", SetLastError = true)]
