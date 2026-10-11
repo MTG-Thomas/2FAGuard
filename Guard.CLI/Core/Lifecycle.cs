@@ -67,6 +67,7 @@ namespace Guard.CLI.Core
                 Environment.Exit(1);
             }
 
+            SettingsManager.Init();
             Version currentVersion = InstallationContext.GetVersion();
 
             if (
@@ -109,7 +110,6 @@ namespace Guard.CLI.Core
                 }
             });
 
-            SettingsManager.Init();
             await Auth.Init();
 
             await CLIAuth.Login();
