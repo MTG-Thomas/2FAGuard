@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Guard.Core.Models;
@@ -58,8 +59,10 @@ namespace Guard.WPF.Core.Export.Exporter
                 };
                 if (tokenHelper.dBToken.EncryptedNotes != null)
                 {
-                    token.Notes = Auth.GetMainEncryptionHelper()
-                        .DecryptBytesToString(tokenHelper.dBToken.EncryptedNotes);
+                    byte[] notes =
+                        tokenHelper.dBToken.DecryptNotes(Auth.GetMainEncryptionHelper())
+                        ?? throw new CryptographicException("Token notes are missing");
+                    token.Notes = Encoding.UTF8.GetString(notes);
                 }
                 if (
                     tokenHelper.dBToken.IconType == IconType.Custom

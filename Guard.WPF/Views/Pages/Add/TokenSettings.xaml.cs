@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -70,9 +71,7 @@ namespace Guard.WPF.Views.Pages.Add
                 }
                 EncryptionHelper encryptionHelper = Auth.GetMainEncryptionHelper();
                 Issuer.Text = existingToken.dBToken.Issuer;
-                Secret.Password = encryptionHelper.DecryptBytesToString(
-                    existingToken.dBToken.EncryptedSecret
-                );
+                Secret.Password = existingToken.dBToken.DecryptSecret(encryptionHelper);
                 if (existingToken.dBToken.Icon != null)
                 {
                     selectedIcon = IconManager.GetIcon(
@@ -94,16 +93,15 @@ namespace Guard.WPF.Views.Pages.Add
                 }
                 if (existingToken.dBToken.EncryptedUsername != null)
                 {
-                    Username.Text = encryptionHelper.DecryptBytesToString(
-                        existingToken.dBToken.EncryptedUsername
-                    );
+                    Username.Text = existingToken.dBToken.DecryptUsername(encryptionHelper);
                 }
                 if (existingToken.dBToken.EncryptedNotes != null)
                 {
                     try
                     {
                         Notes.Document = NotesDocumentCodec.Load(
-                            encryptionHelper.DecryptBytes(existingToken.dBToken.EncryptedNotes)
+                            existingToken.dBToken.DecryptNotes(encryptionHelper)
+                                ?? throw new CryptographicException("Token notes are missing")
                         );
                     }
                     catch (Exception ex)

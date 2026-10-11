@@ -22,6 +22,14 @@ namespace Guard.WPF.Core
                         return;
                     }
                     List<DBTOTPToken> dbTokens = Database.GetAllTokens();
+                    EncryptionHelper encryption = Auth.GetMainEncryptionHelper();
+                    foreach (DBTOTPToken dbToken in dbTokens)
+                    {
+                        if (dbToken.UpgradeEncryption(encryption))
+                        {
+                            Database.UpdateToken(dbToken);
+                        }
+                    }
                     tokenHelpers = dbTokens
                         .Select(dbToken => new TOTPTokenHelper(dbToken))
                         .ToList();
@@ -71,6 +79,7 @@ namespace Guard.WPF.Core
             {
                 return false;
             }
+            dbToken.UpgradeEncryption(Auth.GetMainEncryptionHelper());
             tokenHelpers.Add(tokenHelper);
             Database.AddToken(dbToken);
             return true;

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -443,8 +444,9 @@ namespace Guard.WPF.Views.UIComponents
 
             try
             {
-                var notesBytes = Auth.GetMainEncryptionHelper()
-                    .DecryptBytes(token.dBToken.EncryptedNotes);
+                byte[] notesBytes =
+                    token.dBToken.DecryptNotes(Auth.GetMainEncryptionHelper())
+                    ?? throw new CryptographicException("Token notes are missing");
                 FlowDocument doc = NotesDocumentCodec.Load(notesBytes);
 
                 var viewer = new FlowDocumentScrollViewer { Document = doc };
