@@ -391,7 +391,23 @@ namespace Guard.WPF.Views.UIComponents
 
         private async void MenuItem_Qr_Click(object sender, RoutedEventArgs e)
         {
-            string uri = OTPUriCreator.GetUri(token);
+            string uri;
+            try
+            {
+                uri = OTPUriCreator.GetUri(token);
+            }
+            catch (InvalidOperationException ex)
+            {
+                await new Wpf.Ui.Controls.MessageBox
+                {
+                    Title = I18n.GetString("export.failed.title"),
+                    Content = ex.Message,
+                    CloseButtonText = I18n.GetString("dialog.close"),
+                    MaxWidth = 400,
+                }.ShowDialogAsync();
+                return;
+            }
+
             var qrImage = QRCode.GenerateQRCodeImage(uri, 380);
             var dialog = new QRDialog(mainWindow.GetRootContentDialogHost(), qrImage, 380, 380)
             {
